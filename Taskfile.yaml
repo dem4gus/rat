@@ -2,32 +2,66 @@
 
 version: "3"
 
+vars:
+  COVERFILE: cover.out
+  TARGET_DIR: build
+  TARGET_BIN: rat
+
+
 tasks:
   default:
+    desc: Same as build, can be invoked by running `task` without arguments
     cmds:
       - task: build
 
   build:
+    desc: "Build the program and output to {{.TARGET_DIR}}/{{.TARGET_BIN}}"
     cmds:
-      - go mod tidy
-      - task: test
-      - go build -o build/rat
+      - go build -o {{.TARGET_DIR}}/{{.TARGET_BIN}} main.go
     sources:
       - "**/*.go"
       - go.mod
       - exclude: "**/*_test.go"
     generates:
-      - build/rat
+      - "{{.TARGET_DIR}}/{{.TARGET_BIN}}"
+
+  ci:
+    desc: Run CI tasks
+    deps:
+      - ci:lint
+      - ci:tidy
+      - ci:test
+    cmds:
+      - task: ci:build
+
+  ci:build:
+    cmd: go build -o {{.TARGET_DIR}}/{{.TARGET_BIN}} main.go
+
+  ci:lint:
+    - task: lint
+    
+  ci:test: go test ./... -coverprofile {{.TARGET_DIR}}/{{.COVERFILE}}
+    
+  ci:tidy: go mod tidy -diff
 
   lint:
-    cmd: golangci-lint run
+    desc: Lint source code files
+    cmds:
+      - golangci-lint run
+      - markdownlint-cli2 "**/*.md"
     sources:
       - "**/*.go"
+      - "**/*.md"
       - ".golangci.toml"
+    ignore_error: true
+
+  run:
+    desc: Run the program. Use `task run -- args` to pass in arguments.
+    cmd: go run main.go {{.CLI_ARGS}}
 
   test:
-    cmds:
-      - go test -cover -v
+    desc: Run Go unit tests
+    cmd: go test ./...
     sources:
       - "**/*.go"
       - go.mod

@@ -35,9 +35,9 @@ func runAudit(cmd *cobra.Command, args []string) error {
 	}
 
 	ghclient := github.NewClient(nil)
-	auditclient := audit.NewClient(ghclient.Repositories, owner, name)
+	ghaudit := audit.NewClient(ghclient, owner, name)
 
-	auditclient.Audit(cmd.Context())
+	ghaudit.Run(cmd.Context())
 
 	return nil
 }
