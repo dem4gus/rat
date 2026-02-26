@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: "3"
+
+tasks:
+  default:
+    cmds:
+      - task: build
+
+  build:
+    cmds:
+      - go mod tidy
+      - task: test
+      - go build -o build/rat
+    sources:
+      - "**/*.go"
+      - go.mod
+      - exclude: "**/*_test.go"
+    generates:
+      - build/rat
+
+  run:
+    cmd: go run main.go
+
+  lint:
+    cmd: golangci-lint run
+    sources:
+      - "**/*.go"
+      - ".golangci.toml"
+
+  test:
+    cmds:
+      - go test -cover -v
+    sources:
+      - "**/*.go"
+      - go.mod
+      - exclude: cmd/**/*.go

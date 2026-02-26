@@ -1,0 +1,23 @@
+#:schema https://golangci-lint.run/jsonschema/golangci.jsonschema.json
+
+version = "2"
+
+[linters]
+default = "standard"
+enable = ["funcorder", "godoclint", "gosec", "modernize", "revive"]
+
+[linters.settings]
+godoclint = { enable = ["require-doc", "require-pkg-doc"] }
+
+[linters.exclusions]
+presets = ["comments", "common-false-positives", "legacy", "std-error-handling"]
+
+[[linters.exclusions.rules]]
+path = "_test.go"
+linters = ["godoclint"]
+
+[formatters]
+enable = ["gofumpt"]
+
+[formatters.settings.gofumpt]
+extra-rules = true
