@@ -10,21 +10,24 @@ import (
 
 var cfgFile string
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:   "rat",
-	Short: "Audits code repository configurations",
-	Long: `Repository Audit Tool scans and reports on the configuration of remotely hosted
-code repositories. It brings the 'verify' to 'trust but verify'.`,
+func RootCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use: "rat",
+		Long: `Repository Audit Tool scans and reports on the configuration
+of remotely hosted code repositories.
 
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("called %s with args %s", cmd.CalledAs(), args)
-	},
+It brings the 'verify' to 'trust but verify'.`,
+	}
+
+	cmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $XDG_CONFIG_DIR/rat/config.toml)")
+
+	cmd.AddCommand(AuditCommand())
+	return cmd
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
+	rootCmd := RootCmd()
+
 	err := rootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
@@ -33,16 +36,6 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $XDG_CONFIG_DIR/rat/config.toml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 // initConfig reads in config file and ENV variables if set.

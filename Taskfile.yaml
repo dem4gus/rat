@@ -19,9 +19,6 @@ tasks:
     generates:
       - build/rat
 
-  run:
-    cmd: go run main.go
-
   lint:
     cmd: golangci-lint run
     sources:
