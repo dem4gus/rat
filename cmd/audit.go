@@ -2,12 +2,17 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"strings"
+	"text/tabwriter"
 
 	"github.com/dem4gus/rat/internal/audit"
+	"github.com/fatih/color"
 	"github.com/google/go-github/v83/github"
 	"github.com/spf13/cobra"
 )
+
+const columns = "REPOSITORY\tDEFAULT\tPROTECTED"
 
 // AuditCommand defines the subcommand for performing audits on GitHub repositories.
 // It returns a handle to the command, which can then be called in any
@@ -37,7 +42,12 @@ func runAudit(cmd *cobra.Command, args []string) error {
 	ghclient := github.NewClient(nil)
 	ghaudit := audit.NewClient(ghclient, owner, name)
 
-	ghaudit.Run(cmd.Context())
+	report, err := ghaudit.Run(cmd.Context())
+	if err != nil {
+		return err
+	}
+
+	consolePrint(report)
 
 	return nil
 }
@@ -48,4 +58,16 @@ func parseArg(arg string) (string, string) {
 		return "", ""
 	}
 	return split[0], split[1]
+}
+
+func consolePrint(report *audit.Report) {
+	padding := 5
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', 0)
+	protected := color.RedString("no")
+	if report.Protected {
+		protected = color.GreenString("yes")
+	}
+	fmt.Fprintln(w, columns)
+	fmt.Fprintf(w, "%v\t%v\t%v\n", report.FullName, report.Branch, protected)
+	w.Flush()
 }

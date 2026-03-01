@@ -1,3 +1,4 @@
+// Package cmd defines the commands for the `rat` CLI tool
 package cmd
 
 import (
@@ -10,6 +11,7 @@ import (
 
 var cfgFile string
 
+// RootCmd is the root command for `rat`
 func RootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "rat",
@@ -25,6 +27,7 @@ It brings the 'verify' to 'trust but verify'.`,
 	return cmd
 }
 
+// Execute runs the RootCmd command
 func Execute() {
 	rootCmd := RootCmd()
 

@@ -44,6 +44,10 @@ tasks:
     
   ci:tidy: go mod tidy -diff
 
+  clean:
+    desc: Cleans build and task cache directories
+    cmd: rm -rf build/ .task/
+
   lint:
     desc: Lint source code files
     cmds:

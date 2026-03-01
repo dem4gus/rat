@@ -1,3 +1,6 @@
+// Package audit implements a client for auditing code repository settings.
+//
+// The audit reports the default branch and if it is protected.
 package audit
 
 import (
